@@ -162,15 +162,26 @@ footer {
 /* Contenedor de los botones independientes */
 .auth-buttons {
     display: flex;
-    gap: 10px;         /* Espacio entre los dos botones */
+    gap: 10px;         /* espacio entre botones */
     position: absolute; 
-    top: 20px;         /* Separación desde el borde superior */
-    right: 10px;       /* Separación desde el borde derecho */
-    z-index: 101;      /* Encima del header */
+    top: 25px;         /* separación del borde superior */
+    right: 25px;       /* separación del borde derecho */
+    z-index: 101;
 }
 
-/* Opcional: ajustar tamaño de los botones si quieres */
+/* Ajuste general de botones */
 .auth-buttons .auth-button {
     padding: 8px 16px;
     font-size: 0.95rem;
+}
+
+/* Modal */
+.modal-content {
+    background-color: #111;
+    margin: 12% auto;      /* margen superior para no tocar el header */
+    padding: 30px;
+    border: 1px solid var(--primary-color);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
 }
