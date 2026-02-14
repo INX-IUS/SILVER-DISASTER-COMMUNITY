@@ -11,12 +11,20 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 // ----- Modal Login/Registro -----
-const authBtn = document.getElementById('authBtn');
+const loginBtn = document.getElementById('loginBtn');
+const registerBtn = document.getElementById('registerBtn');
 const modal = document.getElementById('authModal');
 const closeBtn = document.querySelector('.close');
+const form = document.getElementById('authForm');
 
-authBtn.addEventListener('click', () => {
+loginBtn.addEventListener('click', () => {
     modal.style.display = 'block';
+    showLoginForm();
+});
+
+registerBtn.addEventListener('click', () => {
+    modal.style.display = 'block';
+    showRegisterForm();
 });
 
 closeBtn.addEventListener('click', () => {
@@ -29,54 +37,72 @@ window.addEventListener('click', (e) => {
     }
 });
 
+// ----- Funciones para mostrar login o registro -----
+function showLoginForm() {
+    document.getElementById('username').style.display = 'none';
+    form.dataset.mode = 'login';
+}
+function showRegisterForm() {
+    document.getElementById('username').style.display = 'block';
+    form.dataset.mode = 'register';
+}
+
 // ----- Formulario -----
-const form = document.getElementById('authForm');
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value;
 
-    // Intentar iniciar sesión primero
-    auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const user = userCredential.user;
-        alert(`¡Bienvenido de nuevo, ${user.email}!`);
-        modal.style.display = 'none';
-        form.reset();
-    })
-    .catch((error) => {
-        // Si no existe, crear cuenta
-        if(error.code === 'auth/user-not-found'){
-            auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                alert(`Cuenta creada con éxito: ${user.email}`);
-                modal.style.display = 'none';
-                form.reset();
-            })
-            .catch((err) => {
-                alert(`Error: ${err.message}`);
-            });
-        } else {
-            alert(`Error: ${error.message}`);
-        }
-    });
+    if(form.dataset.mode === 'login'){
+        auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            alert(`¡Bienvenido de nuevo, ${user.email}!`);
+            modal.style.display = 'none';
+            form.reset();
+        })
+        .catch((error) => {
+            if(error.code === 'auth/user-not-found'){
+                alert("Usuario no encontrado. Usa el botón Registrarse.");
+            } else if(error.code === 'auth/wrong-password'){
+                alert("Contraseña incorrecta.");
+            } else {
+                alert(`Error: ${error.message}`);
+            }
+        });
+    } else {
+        auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            alert(`Cuenta creada con éxito: ${email}`);
+            modal.style.display = 'none';
+            form.reset();
+        })
+        .catch((err) => {
+            alert(`Error: ${err.message}`);
+        });
+    }
 });
 
 // ----- Detectar usuario logueado -----
 auth.onAuthStateChanged((user) => {
     if(user){
         // Mostrar email del usuario y opción de cerrar sesión
-        authBtn.textContent = user.email + " | Cerrar sesión";
-        authBtn.onclick = () => {
+        loginBtn.style.display = 'none';
+        registerBtn.textContent = user.email + " | Cerrar sesión";
+        registerBtn.onclick = () => {
             auth.signOut().then(() => {
-                authBtn.textContent = "Iniciar sesión / Registrarse";
-                authBtn.onclick = () => modal.style.display = 'block';
+                loginBtn.style.display = 'inline-block';
+                registerBtn.textContent = "Registrarse";
+                registerBtn.onclick = () => showRegisterForm();
             });
         };
     } else {
-        authBtn.textContent = "Iniciar sesión / Registrarse";
-        authBtn.onclick = () => {
+        loginBtn.style.display = 'inline-block';
+        registerBtn.textContent = "Registrarse";
+        registerBtn.onclick = () => {
+            showRegisterForm();
             modal.style.display = 'block';
         };
     }
