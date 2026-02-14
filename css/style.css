@@ -165,7 +165,7 @@ footer {
     gap: 10px;         /* Espacio entre los dos botones */
     position: absolute; 
     top: 20px;         /* Separación desde el borde superior */
-    right: 20px;       /* Separación desde el borde derecho */
+    right: 10px;       /* Separación desde el borde derecho */
     z-index: 101;      /* Encima del header */
 }
 
