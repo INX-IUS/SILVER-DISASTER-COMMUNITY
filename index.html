@@ -1,66 +1,81 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SILVER DISASTER COMMUNITY</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+// ----- Inicializar Firebase -----
+const firebaseConfig = {
+  apiKey: "AIzaSyCtngjc0RO_mt896xHzJ_oXqWK3t2TxB68",
+  authDomain: "silver-disaster.firebaseapp.com",
+  projectId: "silver-disaster",
+  storageBucket: "silver-disaster.firebasestorage.app",
+  messagingSenderId: "848981259894",
+  appId: "1:848981259894:web:0ceba653784c92afef5157"
+};
 
-    <!-- Header -->
-    <header>
-        <div class="logo">SILVER DISASTER COMMUNITY</div>
-        <nav>
-            <a href="#inicio">Inicio</a>
-            <a href="#torneos">Torneos</a>
-            <a href="#scrims">Scrims</a>
-        </nav>
-        <button class="auth-button" id="authBtn">Iniciar sesión / Registrarse</button>
-    </header>
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-    <!-- Sección Inicio -->
-    <section id="inicio">
-        <div class="container">
-            <h1>Bienvenido a SILVER DISASTER COMMUNITY</h1>
-            <p>Tu comunidad de Brawl Stars favorita</p>
-        </div>
-    </section>
+// ----- Modal Login/Registro -----
+const authBtn = document.getElementById('authBtn');
+const modal = document.getElementById('authModal');
+const closeBtn = document.querySelector('.close');
 
-    <!-- Sección Torneos -->
-    <section id="torneos">
-        <div class="container">
-            <h2>Torneos</h2>
-            <p>Aquí aparecerán los torneos disponibles y sus detalles.</p>
-        </div>
-    </section>
+authBtn.addEventListener('click', () => {
+    modal.style.display = 'block';
+});
 
-    <!-- Sección Scrims -->
-    <section id="scrims">
-        <div class="container">
-            <h2>Scrims</h2>
-            <p>Organiza y participa en scrims con otros jugadores.</p>
-        </div>
-    </section>
+closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+});
 
-    <!-- Modal de registro/login -->
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Iniciar sesión / Registrarse</h2>
-            <form id="authForm">
-                <input type="text" id="username" placeholder="Usuario" required>
-                <input type="email" id="email" placeholder="Correo" required>
-                <input type="password" id="password" placeholder="Contraseña" required>
-                <button type="submit">Registrarse / Iniciar sesión</button>
-            </form>
-        </div>
-    </div>
+window.addEventListener('click', (e) => {
+    if(e.target === modal){
+        modal.style.display = 'none';
+    }
+});
 
-    <footer>
-        © 2026 SILVER DISASTER COMMUNITY
-    </footer>
+// ----- Formulario -----
+const form = document.getElementById('authForm');
 
-    <script src="js/script.js"></script>
-</body>
-</html>
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // Intentar iniciar sesión primero
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            alert(`¡Bienvenido de nuevo, ${user.email}!`);
+            modal.style.display = 'none';
+            form.reset();
+        })
+        .catch((error) => {
+            // Si no existe, crear cuenta
+            if(error.code === 'auth/user-not-found'){
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        alert(`Cuenta creada con éxito: ${user.email}`);
+                        modal.style.display = 'none';
+                        form.reset();
+                    })
+                    .catch((err) => {
+                        alert(`Error: ${err.message}`);
+                    });
+            } else {
+                alert(`Error: ${error.message}`);
+            }
+        });
+});
+
+// ----- Detectar usuario logueado -----
+auth.onAuthStateChanged((user) => {
+    if(user){
+        authBtn.textContent = "Cerrar sesión";
+        authBtn.onclick = () => {
+            auth.signOut().then(() => {
+                alert("Has cerrado sesión");
+                authBtn.textContent = "Iniciar sesión / Registrarse";
+                authBtn.onclick = () => modal.style.display = 'block';
+            });
+        };
+    }
+});
