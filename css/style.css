@@ -159,20 +159,18 @@ footer {
     background-color: #070707;
     margin-top: 50px;
 }
-/* Contenedor de los botones independientes */
+/* Contenedor de los botones en el header usando flex */
 .auth-buttons {
     display: flex;
-    gap: 10px;         /* espacio entre botones */
-    position: absolute; 
-    top: 25px;         /* separación del borde superior */
-    right: 25px;       /* separación del borde derecho */
-    z-index: 101;
+    gap: 10px;          /* espacio entre los botones */
+    margin-left: auto;   /* empuja los botones a la derecha dentro del header */
 }
 
 /* Ajuste general de botones */
 .auth-buttons .auth-button {
     padding: 8px 16px;
     font-size: 0.95rem;
+
 }
 
 /* Modal */
